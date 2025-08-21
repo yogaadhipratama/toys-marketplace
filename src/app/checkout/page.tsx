@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { formatIDR } from '@/lib/format';
+import Image from 'next/image';  // Tambah di bagian atas
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -23,7 +24,7 @@ export default function CheckoutPage() {
     postalCode: '',
     country: 'Indonesia'
   });
-  
+
   const [shippingMethod, setShippingMethod] = useState('standard');
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -47,14 +48,14 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
-    
+
     try {
       // Simulate order processing
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       // Generate order number
       const orderNumber = `ORD-${Date.now()}`;
-      
+
       // ✅ Gunakan useEffect untuk localStorage (client-side only)
       if (typeof window !== 'undefined') {
         // Store order in localStorage
@@ -68,21 +69,21 @@ export default function CheckoutPage() {
           status: 'pending',
           date: new Date().toISOString()
         };
-        
+
         const orders = JSON.parse(localStorage.getItem('orders') || '[]');
         orders.push(order);
         localStorage.setItem('orders', JSON.stringify(orders));
       }
-      
+
       // Clear cart and show success
       clearCart();
       setOrderPlaced(true);
-      
+
       // Redirect to success page or show success message
       setTimeout(() => {
         router.push('/account');
       }, 3000);
-      
+
     } catch (error) {
       console.error('Error placing order:', error);
     } finally {
@@ -137,7 +138,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="bg-white rounded-lg border p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
@@ -185,7 +186,7 @@ export default function CheckoutPage() {
               </div>
 
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Shipping Address</h2>
-              
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
                 <Input
@@ -234,7 +235,7 @@ export default function CheckoutPage() {
               </div>
 
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Shipping Method</h2>
-              
+
               <div className="space-y-3 mb-6">
                 <label className="flex items-center">
                   <input
@@ -251,7 +252,7 @@ export default function CheckoutPage() {
                     <span className="ml-auto font-medium">Rp 25.000</span>
                   </div>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -270,7 +271,7 @@ export default function CheckoutPage() {
               </div>
 
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Payment Method</h2>
-              
+
               <div className="space-y-3 mb-6">
                 <label className="flex items-center">
                   <input
@@ -286,7 +287,7 @@ export default function CheckoutPage() {
                     <span>Cash on Delivery</span>
                   </div>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -315,7 +316,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
+          {/* <div className="lg:col-span-1">
             <div className="bg-white rounded-lg border p-6 sticky top-8">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
               
@@ -351,6 +352,33 @@ export default function CheckoutPage() {
                   <span>Total</span>
                   <span>{formatIDR(finalTotal)}</span>
                 </div>
+              </div>
+            </div>
+          </div> */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg border p-6 sticky top-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
+
+              <div className="space-y-4 mb-6">
+                {items.map((item) => (
+                  <div key={item.variantId} className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0">
+                      {/* ✅ Ganti <img> dengan Next.js Image */}
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                      <p className="text-sm text-gray-500">Qty: {item.qty}</p>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900">{formatIDR(item.price * item.qty)}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
