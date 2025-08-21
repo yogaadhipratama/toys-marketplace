@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -8,27 +8,55 @@ import { Input } from '@/components/ui/Input';
 
 interface SearchBarProps {
   placeholder?: string;
+  onSearch: (query: string) => void;
   className?: string;
-  onSearch?: (query: string) => void;
 }
 
 const SearchBar = ({ placeholder = 'Search products...', className, onSearch }: SearchBarProps) => {
   const [query, setQuery] = useState('');
   const router = useRouter();
+  const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) {
-      if (onSearch) {
-        onSearch(query.trim());
-      } else {
-        router.push(`/catalog?search=${encodeURIComponent(query.trim())}`);
+
+  useEffect(() => {
+    // Initialize from URL search params if available
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = urlParams.get('search');
+      if (searchQuery) {
+        setQuery(searchQuery);
       }
+    }
+  }, []);
+
+  // const handleSearch = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (query.trim()) {
+  //     if (onSearch) {
+  //       onSearch(query.trim());
+  //     } else {
+  //       router.push(`/catalog?search=${encodeURIComponent(query.trim())}`);
+  //     }
+  //   }
+  // };
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      setIsSearching(true);
+      onSearch(query.trim());
+
+      // Update URL
+      const params = new URLSearchParams();
+      params.set('search', query.trim());
+      router.push(`/catalog?${params.toString()}`);
+
+      setIsSearching(false);
     }
   };
 
   const handleClear = () => {
     setQuery('');
+    onSearch('');
   };
 
   return (
@@ -56,7 +84,7 @@ const SearchBar = ({ placeholder = 'Search products...', className, onSearch }: 
         )}
       </div>
       <Button type="submit" className="ml-2" disabled={!query.trim()}>
-        Search
+        {isSearching ? 'Searching...' : 'Search'}
       </Button>
     </form>
   );
