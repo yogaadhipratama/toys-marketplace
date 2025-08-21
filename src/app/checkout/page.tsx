@@ -1,10 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
-// import { ArrowLeft, CreditCard, Truck, CheckCircle } from 'lucide-react';
+import { ShoppingCart, CreditCard, Truck, CheckCircle } from 'lucide-react';
 import { useCartStore } from '@/store/cart';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -13,7 +11,7 @@ import { formatIDR } from '@/lib/format';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, getTotalQty, getTotalPrice, clearCart } = useCartStore();
+  const { items, getTotalPrice, clearCart } = useCartStore();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -23,293 +21,335 @@ export default function CheckoutPage() {
     address: '',
     city: '',
     postalCode: '',
-    province: '',
-    shippingMethod: 'regular',
-    paymentMethod: 'cod'
+    country: 'Indonesia'
   });
   
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState('standard');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [isProcessing, setIsProcessing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
 
-  const shippingMethods = [
-    { id: 'regular', name: 'Regular Shipping', price: 0, days: '3-5 business days' },
-    { id: 'express', name: 'Express Shipping', price: 50000, days: '1-2 business days' },
-    { id: 'overnight', name: 'Overnight Shipping', price: 150000, days: 'Next business day' }
-  ];
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push('/catalog');
+    }
+  }, [items, router]);
 
-  const selectedShipping = shippingMethods.find(m => m.id === formData.shippingMethod);
-  const subtotal = getTotalPrice();
-  const shippingCost = selectedShipping?.price || 0;
-  const tax = subtotal * 0.11;
-  const total = subtotal + shippingCost + tax;
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsProcessing(true);
     
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setOrderPlaced(true);
-    clearCart();
-    setIsSubmitting(false);
+    try {
+      // Simulate order processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Generate order number
+      const orderNumber = `ORD-${Date.now()}`;
+      
+      // ✅ Gunakan useEffect untuk localStorage (client-side only)
+      if (typeof window !== 'undefined') {
+        // Store order in localStorage
+        const order = {
+          id: orderNumber,
+          items: items,
+          total: getTotalPrice(),
+          customer: formData,
+          shipping: shippingMethod,
+          payment: paymentMethod,
+          status: 'pending',
+          date: new Date().toISOString()
+        };
+        
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        orders.push(order);
+        localStorage.setItem('orders', JSON.stringify(orders));
+      }
+      
+      // Clear cart and show success
+      clearCart();
+      setOrderPlaced(true);
+      
+      // Redirect to success page or show success message
+      setTimeout(() => {
+        router.push('/account');
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error placing order:', error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  if (items.length === 0 && !orderPlaced) {
-    router.push('/cart');
-    return null;
-  }
-
-  if (orderPlaced) {
+  if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <CheckCircle className="mx-auto h-16 w-16 text-green-600 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
-          <p className="text-gray-600 mb-8">
-            Thank you for your order. We&apos;ll send you a confirmation email with tracking details.
-          </p>
-          <div className="space-y-3">
-            <Link href="/catalog">
-              <Button size="lg">
-                Continue Shopping
-              </Button>
-            </Link>
-            <Link href="/account">
-              <Button variant="outline" size="lg">
-                View Orders
-              </Button>
-            </Link>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <ShoppingCart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+          <p className="text-gray-600 mb-4">Add some products to your cart before checkout</p>
+          <Button onClick={() => router.push('/catalog')}>
+            Continue Shopping
+          </Button>
         </div>
       </div>
     );
   }
 
+  if (orderPlaced) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <CheckCircle className="mx-auto h-12 w-12 text-green-600 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
+          <p className="text-gray-600 mb-4">Thank you for your purchase. You will receive an email confirmation shortly.</p>
+          <Button onClick={() => router.push('/account')}>
+            View Orders
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalPrice = getTotalPrice();
+  const shippingCost = shippingMethod === 'express' ? 50000 : 25000;
+  const finalTotal = totalPrice + shippingCost;
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <Link href="/cart" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Cart
-          </Link>
           <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-          <p className="text-gray-600">Complete your order</p>
+          <p className="text-gray-600">Complete your purchase</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Checkout Form */}
-          <div>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Contact Information */}
-              <div className="bg-white rounded-lg border shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                    <Input
-                      required
-                      value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                    <Input
-                      required
-                      value={formData.lastName}
-                      onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <Input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                    <Input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                    />
-                  </div>
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="bg-white rounded-lg border p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Contact Information</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                  <Input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                  <Input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
               </div>
 
-              {/* Shipping Address */}
-              <div className="bg-white rounded-lg border shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                    <Input
-                      required
-                      value={formData.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
-                      placeholder="Street address, apartment, suite, etc."
-                    />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <Input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <Input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Shipping Address</h2>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <Input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                  <Input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
+                  <Input
+                    type="text"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                  <Select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                  >
+                    <option value="Indonesia">Indonesia</option>
+                    <option value="Malaysia">Malaysia</option>
+                    <option value="Singapore">Singapore</option>
+                    <option value="Thailand">Thailand</option>
+                  </Select>
+                </div>
+              </div>
+
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Shipping Method</h2>
+              
+              <div className="space-y-3 mb-6">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="standard"
+                    checked={shippingMethod === 'standard'}
+                    onChange={(e) => setShippingMethod(e.target.value)}
+                    className="mr-3"
+                  />
+                  <div className="flex items-center">
+                    <Truck className="h-5 w-5 text-gray-400 mr-2" />
+                    <span>Standard Shipping (3-5 days)</span>
+                    <span className="ml-auto font-medium">Rp 25.000</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                      <Input
-                        required
-                        value={formData.city}
-                        onChange={(e) => handleInputChange('city', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                      <Select
-                        required
-                        value={formData.province}
-                        onChange={(e) => handleInputChange('province', e.target.value)}
-                      >
-                        <option value="">Select Province</option>
-                        <option value="jakarta">DKI Jakarta</option>
-                        <option value="jabar">West Java</option>
-                        <option value="jateng">Central Java</option>
-                        <option value="jogja">DI Yogyakarta</option>
-                        <option value="jatim">East Java</option>
-                        <option value="bali">Bali</option>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
-                      <Input
-                        required
-                        value={formData.postalCode}
-                        onChange={(e) => handleInputChange('postalCode', e.target.value)}
-                      />
-                    </div>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="express"
+                    checked={shippingMethod === 'express'}
+                    onChange={(e) => setShippingMethod(e.target.value)}
+                    className="mr-3"
+                  />
+                  <div className="flex items-center">
+                    <Truck className="h-5 w-5 text-blue-600 mr-2" />
+                    <span>Express Shipping (1-2 days)</span>
+                    <span className="ml-auto font-medium">Rp 50.000</span>
                   </div>
-                </div>
+                </label>
               </div>
 
-              {/* Shipping Method */}
-              <div className="bg-white rounded-lg border shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Shipping Method</h2>
-                <div className="space-y-3">
-                  {shippingMethods.map((method) => (
-                    <label key={method.id} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                      <input
-                        type="radio"
-                        name="shippingMethod"
-                        value={method.id}
-                        checked={formData.shippingMethod === method.id}
-                        onChange={(e) => handleInputChange('shippingMethod', e.target.value)}
-                        className="text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="ml-3 flex-1">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900">{method.name}</p>
-                            <p className="text-sm text-gray-500">{method.days}</p>
-                          </div>
-                          <span className="font-medium text-gray-900">
-                            {method.price === 0 ? 'Free' : formatIDR(method.price)}
-                          </span>
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Payment Method</h2>
+              
+              <div className="space-y-3 mb-6">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="cod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="mr-3"
+                  />
+                  <div className="flex items-center">
+                    <CreditCard className="h-5 w-5 text-gray-400 mr-2" />
+                    <span>Cash on Delivery</span>
+                  </div>
+                </label>
+                
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="bank"
+                    checked={paymentMethod === 'bank'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="mr-3"
+                  />
+                  <div className="flex items-center">
+                    <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
+                    <span>Bank Transfer</span>
+                  </div>
+                </label>
               </div>
 
-              {/* Payment Method */}
-              <div className="bg-white rounded-lg border shadow-sm p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Method</h2>
-                <div className="space-y-3">
-                  <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={formData.paymentMethod === 'cod'}
-                      onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
-                      className="text-blue-600 focus:ring-blue-500"
-                    />
-                    <div className="ml-3 flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-gray-900">Cash on Delivery</p>
-                          <p className="text-sm text-gray-500">Pay when you receive your order</p>
-                        </div>
-                        <CreditCard className="h-5 w-5 text-gray-400" />
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Submit Button */}
               <Button
                 type="submit"
+                disabled={isProcessing}
                 className="w-full"
                 size="lg"
-                disabled={isSubmitting}
-                isLoading={isSubmitting}
               >
-                {isSubmitting ? 'Processing Order...' : 'Place Order'}
+                {isProcessing ? 'Processing...' : `Place Order - ${formatIDR(finalTotal)}`}
               </Button>
             </form>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border shadow-sm p-6 sticky top-24">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+            <div className="bg-white rounded-lg border p-6 sticky top-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
               
-              {/* Items */}
-              <div className="space-y-3 mb-6">
+              <div className="space-y-4 mb-6">
                 {items.map((item) => (
-                  <div key={item.variantId} className="flex items-center justify-between text-sm">
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{item.name}</p>
-                      <p className="text-gray-500">Qty: {item.qty}</p>
+                  <div key={item.variantId} className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex-shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
                     </div>
-                    <span className="font-medium">{formatIDR(item.price * item.qty)}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                      <p className="text-sm text-gray-500">Qty: {item.qty}</p>
+                    </div>
+                    <p className="text-sm font-medium text-gray-900">{formatIDR(item.price * item.qty)}</p>
                   </div>
                 ))}
               </div>
               
-              {/* Totals */}
-              <div className="border-t pt-4 space-y-3">
+              <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal ({getTotalQty()} items)</span>
-                  <span className="font-medium">{formatIDR(subtotal)}</span>
+                  <span>Subtotal</span>
+                  <span>{formatIDR(totalPrice)}</span>
                 </div>
-                
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">
-                    {shippingCost === 0 ? 'Free' : formatIDR(shippingCost)}
-                  </span>
+                  <span>Shipping</span>
+                  <span>{formatIDR(shippingCost)}</span>
                 </div>
-                
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">{formatIDR(tax)}</span>
-                </div>
-                
-                <div className="border-t pt-3">
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>Total</span>
-                    <span>{formatIDR(total)}</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Including tax and shipping</p>
+                <div className="flex justify-between text-lg font-semibold">
+                  <span>Total</span>
+                  <span>{formatIDR(finalTotal)}</span>
                 </div>
               </div>
             </div>
