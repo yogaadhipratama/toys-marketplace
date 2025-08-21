@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback} from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { ShoppingCart, Heart, Star, Truck, Shield, Package, AlertTriangle } from 'lucide-react';
+import { ShoppingCart, Heart, Shield, Package, AlertTriangle, Link } from 'lucide-react';
 import { fetchProductBySlug, Product, ProductVariant } from '@/lib/api';
 import { useCartStore } from '@/store/cart';
 import { Button } from '@/components/ui/Button';
@@ -23,11 +23,13 @@ export default function ProductDetailPage() {
   const [showAgeGate, setShowAgeGate] = useState(false);
   
   const addToCart = useCartStore((state) => state.addItem);
-  const itemQty = useCartStore((state) => state.getItemQty(''));
+  // const itemQty = useCartStore((state) => state.getItemQty(''));
 
-  useEffect(() => {
-    loadProduct();
-  }, [slug]);
+  // useEffect(() => {
+  //   loadProduct();
+  // }, [slug]);
+
+  
 
   useEffect(() => {
     if (product && product.variants.length > 0) {
@@ -35,7 +37,7 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  const loadProduct = async () => {
+  const loadProduct = useCallback(async () => {
     setLoading(true);
     try {
       const productData = await fetchProductBySlug(slug);
@@ -52,7 +54,11 @@ export default function ProductDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug]);
+
+  useEffect(() => {
+    loadProduct();
+  }, [loadProduct]);
 
   const handleAddToCart = () => {
     if (!selectedVariant || !product) return;
@@ -92,7 +98,7 @@ export default function ProductDetailPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
-          <p className="text-gray-600">The product you're looking for doesn't exist.</p>
+          <p className="text-gray-600">The product you&apos;re looking for doesn&apos;t exist.</p>
         </div>
       </div>
     );
@@ -107,7 +113,7 @@ export default function ProductDetailPage() {
         {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-500">
-            <li><a href="/" className="hover:text-blue-600">Home</a></li>
+            <li><Link href="/" className="hover:text-blue-600">Home</Link></li>
             <li>/</li>
             <li><a href="/catalog" className="hover:text-blue-600">Catalog</a></li>
             <li>/</li>

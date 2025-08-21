@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
-import { fetchProducts, fetchCategories, Product, Category } from '@/lib/api';
+import { fetchProducts, fetchCategories, Product, Category, ProductFilters } from '@/lib/api';
 import ProductCard from '@/components/shared/ProductCard';
 import CategoryPills from '@/components/shared/CategoryPills';
 import SearchBar from '@/components/shared/SearchBar';
@@ -11,27 +11,39 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import Pagination from '@/components/shared/Pagination';
-import { formatIDR } from '@/lib/format';
 
 const ITEMS_PER_PAGE = 12;
 
-export default function CatalogPage() {
+// Separate component that uses useSearchParams
+function CatalogContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-  
-  // Filter states
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true');
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+
+  // Filter states - initialize from searchParams
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [inStock, setInStock] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Initialize state from searchParams after component mounts
+  useEffect(() => {
+    if (searchParams) {
+      setSelectedCategory(searchParams.get('category') || '');
+      setMinPrice(searchParams.get('minPrice') || '');
+      setMaxPrice(searchParams.get('maxPrice') || '');
+      setInStock(searchParams.get('inStock') === 'true');
+      setSearchQuery(searchParams.get('search') || '');
+      setCurrentPage(parseInt(searchParams.get('page') || '1'));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     loadData();
@@ -46,7 +58,7 @@ export default function CatalogPage() {
     if (inStock) params.set('inStock', 'true');
     if (searchQuery) params.set('search', searchQuery);
     if (currentPage > 1) params.set('page', currentPage.toString());
-    
+
     const newUrl = `/catalog${params.toString() ? `?${params.toString()}` : ''}`;
     router.push(newUrl);
   }, [selectedCategory, minPrice, maxPrice, inStock, searchQuery, currentPage, router]);
@@ -70,15 +82,15 @@ export default function CatalogPage() {
   const applyFilters = async () => {
     setLoading(true);
     setCurrentPage(1);
-    
+
     try {
-      const filters: any = {};
+      const filters: ProductFilters = {};
       if (selectedCategory) filters.category = selectedCategory;
       if (minPrice) filters.minPrice = parseInt(minPrice);
       if (maxPrice) filters.maxPrice = parseInt(maxPrice);
       if (inStock) filters.inStock = true;
       if (searchQuery) filters.search = searchQuery;
-      
+
       const filteredProducts = await fetchProducts(filters);
       setProducts(filteredProducts);
     } catch (error) {
@@ -141,7 +153,7 @@ export default function CatalogPage() {
               onSearch={handleSearch}
               className="flex-1 max-w-md"
             />
-            
+
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -151,7 +163,7 @@ export default function CatalogPage() {
                 <Filter className="h-4 w-4" />
                 Filters
               </Button>
-              
+
               <div className="flex border rounded-md">
                 <Button
                   variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -197,7 +209,7 @@ export default function CatalogPage() {
                   ))}
                 </Select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
                 <Input
@@ -207,7 +219,7 @@ export default function CatalogPage() {
                   onChange={(e) => setMinPrice(e.target.value)}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
                 <Input
@@ -217,7 +229,7 @@ export default function CatalogPage() {
                   onChange={(e) => setMaxPrice(e.target.value)}
                 />
               </div>
-              
+
               <div className="flex items-end">
                 <label className="flex items-center">
                   <input
@@ -230,7 +242,7 @@ export default function CatalogPage() {
                 </label>
               </div>
             </div>
-            
+
             <div className="flex gap-2 mt-4">
               <Button onClick={applyFilters}>Apply Filters</Button>
               <Button variant="outline" onClick={clearFilters}>Clear All</Button>
@@ -243,7 +255,7 @@ export default function CatalogPage() {
           <p className="text-gray-600">
             Showing {startIndex + 1}-{Math.min(endIndex, products.length)} of {products.length} products
           </p>
-          
+
           {products.length > 0 && (
             <div className="text-sm text-gray-500">
               Page {currentPage} of {totalPages}
@@ -253,14 +265,13 @@ export default function CatalogPage() {
 
         {/* Products Grid */}
         {currentProducts.length > 0 ? (
-          <div className={`grid gap-6 ${
-            viewMode === 'grid' 
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+          <div className={`grid gap-6 ${viewMode === 'grid'
+              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
               : 'grid-cols-1'
-          }`}>
+            }`}>
             {currentProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
+              <ProductCard
+                key={product.id}
                 product={product}
                 className={viewMode === 'list' ? 'flex flex-row' : ''}
               />
@@ -289,5 +300,21 @@ export default function CatalogPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Main component with Suspense - NO useSearchParams here
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading catalog...</p>
+        </div>
+      </div>
+    }>
+      <CatalogContent />
+    </Suspense>
   );
 }

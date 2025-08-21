@@ -47,7 +47,7 @@ const AgeGateModal = ({ isOpen, onConfirm, onClose }: AgeGateModalProps) => {
         
         <p className="text-sm text-gray-500 mb-6">
           This product contains items that require you to be 18 years or older to purchase. 
-          By clicking "I am 18 or older", you confirm that you meet the age requirement.
+          By clicking &quot;I am 18 or older&quot;, you confirm that you meet the age requirement.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-3">
