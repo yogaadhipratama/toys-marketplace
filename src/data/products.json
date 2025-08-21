@@ -1,0 +1,365 @@
+[
+  {
+    "id": 1,
+    "name": "Gel Blaster Pro X1",
+    "slug": "gel-blaster-pro-x1",
+    "category": "airsoft",
+    "description": "High-performance gel blaster with adjustable FPS, perfect for tactical games and training.",
+    "price": 2500000,
+    "originalPrice": 3000000,
+    "stock": 15,
+    "weight": 2.5,
+    "images": [
+      "/images/gel-blaster-1.jpg",
+      "/images/gel-blaster-2.jpg",
+      "/images/gel-blaster-3.jpg"
+    ],
+    "variants": [
+      {
+        "id": "gb-x1-black",
+        "sku": "GB-X1-BLK",
+        "name": "Black",
+        "price": 2500000,
+        "stock": 8
+      },
+      {
+        "id": "gb-x1-tan",
+        "sku": "GB-X1-TAN",
+        "name": "Tan",
+        "price": 2500000,
+        "stock": 7
+      }
+    ],
+    "features": [
+      "Adjustable FPS (200-350)",
+      "High-capacity magazine",
+      "Metal gearbox",
+      "Ergonomic grip"
+    ],
+    "ageRating": "18+",
+    "isNew": true
+  },
+  {
+    "id": 2,
+    "name": "RC Drone Racing FPV",
+    "slug": "rc-drone-racing-fpv",
+    "category": "rc",
+    "description": "Professional FPV racing drone with 4K camera and high-speed performance.",
+    "price": 4500000,
+    "originalPrice": 5000000,
+    "stock": 8,
+    "weight": 1.2,
+    "images": [
+      "/images/rc-drone-1.jpg",
+      "/images/rc-drone-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "rc-drone-fpv",
+        "sku": "RC-DRONE-FPV",
+        "name": "Standard",
+        "price": 4500000,
+        "stock": 8
+      }
+    ],
+    "features": [
+      "4K FPV camera",
+      "Max speed 120km/h",
+      "20+ minutes flight time",
+      "GPS positioning"
+    ],
+    "ageRating": "14+",
+    "isNew": true
+  },
+  {
+    "id": 3,
+    "name": "LEGO Technic Bugatti Chiron",
+    "slug": "lego-technic-bugatti-chiron",
+    "category": "lego",
+    "description": "Detailed replica of the iconic Bugatti Chiron with working gearbox and steering.",
+    "price": 3500000,
+    "originalPrice": 3500000,
+    "stock": 12,
+    "weight": 3.8,
+    "images": [
+      "/images/lego-bugatti-1.jpg",
+      "/images/lego-bugatti-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "lego-bugatti",
+        "sku": "LEGO-BUGATTI",
+        "name": "Standard",
+        "price": 3500000,
+        "stock": 12
+      }
+    ],
+    "features": [
+      "3599 pieces",
+      "Working gearbox",
+      "Steering mechanism",
+      "Display stand included"
+    ],
+    "ageRating": "16+",
+    "isNew": false
+  },
+  {
+    "id": 4,
+    "name": "Action Figure Marvel Legends Iron Man",
+    "slug": "action-figure-marvel-legends-iron-man",
+    "category": "action-figure",
+    "description": "Highly detailed Iron Man action figure with multiple articulation points and accessories.",
+    "price": 850000,
+    "originalPrice": 1000000,
+    "stock": 25,
+    "weight": 0.3,
+    "images": [
+      "/images/iron-man-1.jpg",
+      "/images/iron-man-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "iron-man-mark85",
+        "sku": "AF-IM-MK85",
+        "name": "Mark 85",
+        "price": 850000,
+        "stock": 15
+      },
+      {
+        "id": "iron-man-mark50",
+        "sku": "AF-IM-MK50",
+        "name": "Mark 50",
+        "price": 900000,
+        "stock": 10
+      }
+    ],
+    "features": [
+      "30+ articulation points",
+      "Interchangeable hands",
+      "Arc reactor effects",
+      "Display stand"
+    ],
+    "ageRating": "6+",
+    "isNew": false
+  },
+  {
+    "id": 5,
+    "name": "Airsoft M4A1 Carbine",
+    "slug": "airsoft-m4a1-carbine",
+    "category": "airsoft",
+    "description": "Realistic M4A1 airsoft rifle with full metal construction and adjustable hop-up.",
+    "price": 3800000,
+    "originalPrice": 4200000,
+    "stock": 6,
+    "weight": 3.2,
+    "images": [
+      "/images/airsoft-m4-1.jpg",
+      "/images/airsoft-m4-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "m4a1-black",
+        "sku": "AS-M4-BLK",
+        "name": "Black",
+        "price": 3800000,
+        "stock": 4
+      },
+      {
+        "id": "m4a1-tan",
+        "sku": "AS-M4-TAN",
+        "name": "Tan",
+        "price": 3800000,
+        "stock": 2
+      }
+    ],
+    "features": [
+      "Full metal construction",
+      "Adjustable hop-up",
+      "High-capacity magazine",
+      "RIS rail system"
+    ],
+    "ageRating": "18+",
+    "isNew": false
+  },
+  {
+    "id": 6,
+    "name": "RC Car Monster Truck",
+    "slug": "rc-car-monster-truck",
+    "category": "rc",
+    "description": "High-speed RC monster truck with 4WD and waterproof electronics.",
+    "price": 2800000,
+    "originalPrice": 3200000,
+    "stock": 18,
+    "weight": 2.1,
+    "images": [
+      "/images/rc-truck-1.jpg",
+      "/images/rc-truck-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "rc-truck-red",
+        "sku": "RC-TRUCK-RED",
+        "name": "Red",
+        "price": 2800000,
+        "stock": 10
+      },
+      {
+        "id": "rc-truck-blue",
+        "sku": "RC-TRUCK-BLU",
+        "name": "Blue",
+        "price": 2800000,
+        "stock": 8
+      }
+    ],
+    "features": [
+      "4WD system",
+      "Waterproof electronics",
+      "Max speed 45km/h",
+      "Rechargeable battery"
+    ],
+    "ageRating": "12+",
+    "isNew": false
+  },
+  {
+    "id": 7,
+    "name": "LEGO Star Wars Millennium Falcon",
+    "slug": "lego-star-wars-millennium-falcon",
+    "category": "lego",
+    "description": "Iconic Millennium Falcon with detailed interior and minifigures.",
+    "price": 2800000,
+    "originalPrice": 3200000,
+    "stock": 9,
+    "weight": 2.8,
+    "images": [
+      "/images/lego-falcon-1.jpg",
+      "/images/lego-falcon-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "lego-falcon",
+        "sku": "LEGO-FALCON",
+        "name": "Standard",
+        "price": 2800000,
+        "stock": 9
+      }
+    ],
+    "features": [
+      "1329 pieces",
+      "7 minifigures",
+      "Detailed interior",
+      "Display stand"
+    ],
+    "ageRating": "9+",
+    "isNew": false
+  },
+  {
+    "id": 8,
+    "name": "Action Figure Dragon Ball Goku",
+    "slug": "action-figure-dragon-ball-goku",
+    "category": "action-figure",
+    "description": "Premium Goku action figure with multiple faces and energy effects.",
+    "price": 1200000,
+    "originalPrice": 1500000,
+    "stock": 20,
+    "weight": 0.4,
+    "images": [
+      "/images/goku-1.jpg",
+      "/images/goku-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "goku-ssj",
+        "sku": "AF-GOKU-SSJ",
+        "name": "Super Saiyan",
+        "price": 1200000,
+        "stock": 12
+      },
+      {
+        "id": "goku-ssb",
+        "sku": "AF-GOKU-SSB",
+        "name": "Super Saiyan Blue",
+        "price": 1300000,
+        "stock": 8
+      }
+    ],
+    "features": [
+      "Multiple face expressions",
+      "Energy effect parts",
+      "High articulation",
+      "Collector's edition"
+    ],
+    "ageRating": "6+",
+    "isNew": true
+  },
+  {
+    "id": 9,
+    "name": "Gel Blaster Pistol Compact",
+    "slug": "gel-blaster-pistol-compact",
+    "category": "airsoft",
+    "description": "Compact gel blaster pistol perfect for close combat and training.",
+    "price": 1200000,
+    "originalPrice": 1500000,
+    "stock": 22,
+    "weight": 0.8,
+    "images": [
+      "/images/gel-pistol-1.jpg",
+      "/images/gel-pistol-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "gel-pistol-black",
+        "sku": "GP-BLK",
+        "name": "Black",
+        "price": 1200000,
+        "stock": 12
+      },
+      {
+        "id": "gel-pistol-silver",
+        "sku": "GP-SLV",
+        "name": "Silver",
+        "price": 1200000,
+        "stock": 10
+      }
+    ],
+    "features": [
+      "Compact design",
+      "High accuracy",
+      "Quick reload",
+      "Safety lock"
+    ],
+    "ageRating": "18+",
+    "isNew": false
+  },
+  {
+    "id": 10,
+    "name": "LEGO Architecture Tokyo",
+    "slug": "lego-architecture-tokyo",
+    "category": "lego",
+    "description": "Beautiful Tokyo skyline with iconic landmarks in LEGO Architecture style.",
+    "price": 1800000,
+    "originalPrice": 2000000,
+    "stock": 15,
+    "weight": 1.5,
+    "images": [
+      "/images/lego-tokyo-1.jpg",
+      "/images/lego-tokyo-2.jpg"
+    ],
+    "variants": [
+      {
+        "id": "lego-tokyo",
+        "sku": "LEGO-TOKYO",
+        "name": "Standard",
+        "price": 1800000,
+        "stock": 15
+      }
+    ],
+    "features": [
+      "547 pieces",
+      "Tokyo Tower",
+      "Skytree",
+      "Display stand"
+    ],
+    "ageRating": "12+",
+    "isNew": false
+  }
+]

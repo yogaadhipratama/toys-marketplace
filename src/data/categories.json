@@ -1,0 +1,34 @@
+[
+  {
+    "id": "airsoft",
+    "name": "Airsoft & Gel Blaster",
+    "description": "Realistic airsoft guns and gel blasters for tactical games",
+    "icon": "gun",
+    "ageRestriction": "18+",
+    "productCount": 3
+  },
+  {
+    "id": "rc",
+    "name": "RC Vehicles",
+    "description": "Remote control cars, drones, and vehicles",
+    "icon": "car",
+    "ageRestriction": "12+",
+    "productCount": 2
+  },
+  {
+    "id": "lego",
+    "name": "LEGO Sets",
+    "description": "Building blocks and construction sets",
+    "icon": "blocks",
+    "ageRestriction": "6+",
+    "productCount": 3
+  },
+  {
+    "id": "action-figure",
+    "name": "Action Figures",
+    "description": "Collectible action figures and figurines",
+    "icon": "figure",
+    "ageRestriction": "6+",
+    "productCount": 2
+  }
+]
