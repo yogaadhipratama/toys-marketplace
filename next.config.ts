@@ -1,7 +1,25 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // ✅ Hapus experimental.turbopack
+  experimental: {
+    // turbopack: {
+    //   rules: {
+    //     '*.svg': {
+    //       loaders: ['@svgr/webpack'],
+    //       as: '*.js',
+    //     },
+    //   },
+    // },
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

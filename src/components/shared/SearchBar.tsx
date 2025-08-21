@@ -15,40 +15,25 @@ interface SearchBarProps {
 const SearchBar = ({ placeholder = 'Search products...', className, onSearch }: SearchBarProps) => {
   const [query, setQuery] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSearching, setIsSearching] = useState(false);
 
-  const searchParams = useSearchParams();
-
+  // ✅ Hapus check window, langsung gunakan searchParams
   useEffect(() => {
-    // Initialize from URL search params if available
-    if (typeof window !== 'undefined') {
-      // const urlParams = new URLSearchParams(window.location.search);
-      const searchQuery = searchParams.get('search');
-      // const searchQuery = urlParams.get('search');
-      if (searchQuery) {
-        setQuery(searchQuery);
-      }
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      setQuery(searchQuery);
     }
   }, [searchParams]);
 
-  // const handleSearch = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (query.trim()) {
-  //     if (onSearch) {
-  //       onSearch(query.trim());
-  //     } else {
-  //       router.push(`/catalog?search=${encodeURIComponent(query.trim())}`);
-  //     }
-  //   }
-  // };
-
-  const handleSearch = () => {
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     if (query.trim()) {
       setIsSearching(true);
       onSearch(query.trim());
 
-      // Update URL
-      const params = new URLSearchParams();
+      // Update URL using searchParams
+      const params = new URLSearchParams(searchParams.toString());
       params.set('search', query.trim());
       router.push(`/catalog?${params.toString()}`);
 
@@ -59,6 +44,11 @@ const SearchBar = ({ placeholder = 'Search products...', className, onSearch }: 
   const handleClear = () => {
     setQuery('');
     onSearch('');
+    
+    // Clear URL search param
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('search');
+    router.push(`/catalog${params.toString() ? `?${params.toString()}` : ''}`);
   };
 
   return (
