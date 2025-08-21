@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -17,17 +17,19 @@ const SearchBar = ({ placeholder = 'Search products...', className, onSearch }: 
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
 
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Initialize from URL search params if available
     if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const searchQuery = urlParams.get('search');
+      // const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = searchParams.get('search');
+      // const searchQuery = urlParams.get('search');
       if (searchQuery) {
         setQuery(searchQuery);
       }
     }
-  }, []);
+  }, [searchParams]);
 
   // const handleSearch = (e: React.FormEvent) => {
   //   e.preventDefault();
