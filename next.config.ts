@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // ✅ Hapus experimental.turbopack
-  experimental: {
+  // experimental: {
     // turbopack: {
     //   rules: {
     //     '*.svg': {
@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
     //     },
     //   },
     // },
-  },
+  // },
   images: {
     remotePatterns: [
       {
